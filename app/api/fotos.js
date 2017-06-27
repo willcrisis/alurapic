@@ -1,45 +1,67 @@
+var mongoose = require('mongoose');
+var model = mongoose.model('Foto');
+
 var api = {};
 
-var fotos = [
-    {_id: 1, titulo: 'Leão', url: 'http://www.fundosanimais.com/Minis/leoes.jpg'},
-    {_id: 2, titulo: 'Leão 2', url: 'http://www.fundosanimais.com/Minis/leoes.jpg'}
-];
-
-var CONTADOR = fotos.length;
-
 api.listar = function (req, res) {
-    res.json(fotos);
+
+    model
+        .find({})
+        .then(function (fotos) {
+            res.json(fotos);
+        }, function (error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
 };
 
-api.obter = function(req, res) {
-    var foto = fotos.find(function(item) {
-        return item._id == req.params.id;
-    });
-    res.json(foto);
+api.obter = function (req, res) {
+    model
+        .findById(req.params.id)
+        .then(function (foto) {
+            if (!foto) {
+                res.status(404);
+                return;
+            }
+            ;
+            res.json(foto);
+        }, function (error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
 };
 
-api.excluir = function(req, res) {
-    fotos = fotos.filter(function(item) {
-        return item._id != req.params.id;
-    });
-    res.sendStatus(204);
+api.excluir = function (req, res) {
+    model
+        .remove({_id: req.params.id})
+        .then(function () {
+            res.sendStatus(204);
+        }, function (error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
 };
 
-api.incluir = function(req, res) {
-    var foto = req.body;
-    foto._id = ++CONTADOR;
-    fotos.push(foto);
-    res.json(foto);
+api.incluir = function (req, res) {
+    model
+        .create(req.body)
+        .then(function (foto) {
+            res.json(foto);
+        }, function (error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
 };
 
-api.editar = function(req, res) {
-    var foto = fotos.findIndex(function(item) {
-        return item._id == req.params.id;
-    });
-
-    fotos[foto] = req.body;
-
-    res.json(req.body);
+api.editar = function (req, res) {
+    model
+        .findByIdAndUpdate(req.params.id, req.body)
+        .then(function (foto) {
+            res.json(foto);
+        }, function (error) {
+            console.log(error);
+            res.status(500).json(error);
+        });
 };
 
 module.exports = api;
