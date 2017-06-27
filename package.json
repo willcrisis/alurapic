@@ -10,6 +10,8 @@
   "author": "Willian Krause",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.17.2",
+    "consign": "^0.1.6",
     "express": "^4.15.3"
   }
 }
